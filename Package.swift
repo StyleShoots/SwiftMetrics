@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.10
 /**
 * Copyright IBM Corporation 2017-2019
 *
@@ -21,9 +21,9 @@ import Foundation
 var webSocketPackage: Package.Dependency
 
 if ProcessInfo.processInfo.environment["KITURA_NIO"] != nil {
-    webSocketPackage = .package(url: "https://github.com/Kitura/Kitura-WebSocket-NIO.git", from: "2.1.200")
+    webSocketPackage = .package(url: "https://github.com/StyleShoots/Kitura-WebSocket-NIO.git", branch: "master")
 } else {
-    webSocketPackage = .package(url: "https://github.com/Kitura/Kitura-WebSocket.git", from: "2.1.200")
+    webSocketPackage = .package(url: "https://github.com/StyleShoots/Kitura-WebSocket.git", branch: "master")
 }
 
 let package = Package(
@@ -47,12 +47,17 @@ let package = Package(
     webSocketPackage,
     .package(url: "https://github.com/IBM-Swift/Swift-cfenv.git", from: "6.0.0"),
     .package(url: "https://github.com/RuntimeTools/omr-agentcore", .exact("3.2.4-swift4")),
-    .package(url: "https://github.com/IBM-Swift/BlueCryptor.git", from: "1.0.0"),
+    .package(url: "https://github.com/IBM-Swift/BlueCryptor.git", from: "2.0.0"),
   ],
   targets: [
-      .target(name: "SwiftMetrics", dependencies: ["agentcore", "hcapiplugin", "envplugin", "cpuplugin", "memplugin", "CloudFoundryEnv"]),
+      .target(name: "SwiftMetrics", dependencies: [.product(name: "agentcore", package: "omr-agentcore"),
+                                                  .product(name: "hcapiplugin", package: "omr-agentcore"),
+                                                  .product(name: "envplugin", package: "omr-agentcore"),
+                                                  .product (name: "cpuplugin", package: "omr-agentcore"),
+                                                  .product(name: "memplugin", package: "omr-agentcore"),
+                                                  .product(name: "CloudFoundryEnv", package: "Swift-cfenv")]),
       .target(name: "SwiftMetricsKitura", dependencies: ["SwiftMetrics", "Kitura"]),
-      .target(name: "SwiftBAMDC", dependencies: ["SwiftMetricsKitura", "Kitura-WebSocket", "Cryptor"]),
+      .target(name: "SwiftBAMDC", dependencies: ["SwiftMetricsKitura", "Kitura-WebSocket", .product(name: "Cryptor", package: "BlueCryptor")]),
       .target(name: "SwiftMetricsBluemix", dependencies: ["SwiftMetricsKitura","SwiftBAMDC"]),
       .target(name: "SwiftMetricsDash", dependencies: ["SwiftMetricsBluemix"]),
       .target(name: "SwiftMetricsREST", dependencies: ["SwiftMetricsKitura"]),
