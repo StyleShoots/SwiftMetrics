@@ -16,15 +16,6 @@
 **/
 
 import PackageDescription
-import Foundation
-
-var webSocketPackage: Package.Dependency
-
-if ProcessInfo.processInfo.environment["KITURA_NIO"] != nil {
-    webSocketPackage = .package(url: "https://github.com/StyleShoots/Kitura-WebSocket-NIO.git", branch: "master")
-} else {
-    webSocketPackage = .package(url: "https://github.com/StyleShoots/Kitura-WebSocket.git", branch: "master")
-}
 
 let package = Package(
   name: "SwiftMetrics",
@@ -44,7 +35,7 @@ let package = Package(
     ],
   dependencies: [
     .package(url: "https://github.com/IBM-Swift/Kitura.git", from: "2.3.0"),
-    webSocketPackage,
+    .package(url: "https://github.com/StyleShoots/Kitura-WebSocket-NIO.git", branch: "master"),
     .package(url: "https://github.com/IBM-Swift/Swift-cfenv.git", from: "6.0.0"),
     .package(url: "https://github.com/RuntimeTools/omr-agentcore", .exact("3.2.4-swift4")),
     .package(url: "https://github.com/IBM-Swift/BlueCryptor.git", from: "2.0.0"),
@@ -57,7 +48,7 @@ let package = Package(
                                                   .product(name: "memplugin", package: "omr-agentcore"),
                                                   .product(name: "CloudFoundryEnv", package: "Swift-cfenv")]),
       .target(name: "SwiftMetricsKitura", dependencies: ["SwiftMetrics", "Kitura"]),
-      .target(name: "SwiftBAMDC", dependencies: ["SwiftMetricsKitura", "Kitura-WebSocket", .product(name: "Cryptor", package: "BlueCryptor")]),
+      .target(name: "SwiftBAMDC", dependencies: ["SwiftMetricsKitura", .product(name: "Kitura-WebSocket", package: "Kitura-WebSocket-NIO"), .product(name: "Cryptor", package: "BlueCryptor")]),
       .target(name: "SwiftMetricsBluemix", dependencies: ["SwiftMetricsKitura","SwiftBAMDC"]),
       .target(name: "SwiftMetricsDash", dependencies: ["SwiftMetricsBluemix"]),
       .target(name: "SwiftMetricsREST", dependencies: ["SwiftMetricsKitura"]),
